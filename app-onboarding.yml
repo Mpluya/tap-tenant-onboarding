@@ -4,359 +4,248 @@
 apiVersion: kappctrl.k14s.io/v1alpha1
 kind: App
 metadata:
-name: app-onboarding
-annotations:
-kapp.k14s.io/change-rule: "upsert after upserting tap"
+  name: app-onboarding
 spec:
-fetch:
-- inline:
-  pathsFrom:
-  - secretRef:
-      name: app-onboarding-files
-template:
-- ytt:
-  ignoreUnknownComments: true
-  valuesFrom:
-  - secretRef:
-      name: app-onboarding-secrets
-  - secretRef:
-      name: app-onboarding-values
-- kbld: {}
-deploy:
-- kapp: {}
+  serviceAccountName: tap-tap-install-sa
+  fetch:
+  - inline:
+      pathsFrom:
+      - secretRef:
+          name: app-onboarding-files
+  template:
+  - ytt:
+      ignoreUnknownComments: true
+      valuesFrom:
+      - secretRef:
+          name: app-onboarding-secrets
+      - secretRef:
+          name: app-onboarding-values
+  - kbld: {}
+  deploy:
+  - kapp: 
+      rawOptions: ["--dangerous-override-ownership-of-existing-resources=true"]
 ---
 apiVersion: v1
 kind: Secret
 metadata:
-name: app-onboarding-values
+  name: app-onboarding-values
 stringData:
-values.yaml: #@ yaml.encode({ "tenants": data.values.tenants, "domain": data.values.domain })
+  values.yaml: #@ yaml.encode({ "additional_users": data.values.additional_users })
 ---
 apiVersion: v1
 kind: Secret
 metadata:
-name: app-onboarding-files
+  name: app-onboarding-files
 stringData:
-additional-tenants.yaml: |
-#@ load("@ytt:overlay", "overlay")
-#@ load("@ytt:data", "data")
-#@ load("@ytt:base64", "base64")
-#@ load("@ytt:json", "json")
-#@ load("@ytt:yaml", "yaml")
+  additional-users.yaml: |
+    #@ load("@ytt:overlay", "overlay")
+    #@ load("@ytt:data", "data")
+    #@ load("@ytt:base64", "base64")
+    #@ load("@ytt:json", "json")
+    #@ load("@ytt:yaml", "yaml")
 
-#@ for tenant in data.values.tenants:
----
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: #@ tenant
----
-apiVersion: v1
-kind: ServiceAccount
-metadata:
-  name: #@ tenant
-  namespace: #@ tenant
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: RoleBinding
-metadata:
-  name: #@ "{}-tenant-role-binding".format(tenant)
-  namespace: #@ tenant
-  annotations:
-    kapp.k14s.io/update-strategy:
-roleRef:
-  apiGroup: rbac.authorization.k8s.io
-  kind: ClusterRole
-  name: build-service-tenant-role
-subjects:
-- kind: ServiceAccount
-  name: #@ tenant
-  namespace: #@ tenant
----
-apiVersion: v1
-kind: Secret
-metadata:
-  name: #@ "{}-registry-credentials".format(tenant)
-  namespace: #@ tenant
-  annotations:
-    secretgen.carvel.dev/image-pull-secret: ""
-type: kubernetes.io/dockerconfigjson
-data:
-  .dockerconfigjson: e30K
+    #@ for user in data.values.additional_users:
+    ---
+    apiVersion: v1
+    kind: Namespace
+    metadata:
+      name: #@ user
+    ---
+    apiVersion: v1
+    kind: Secret
+    metadata:
+      name: tap-registry
+      namespace: #@ user
+      annotations:
+        secretgen.carvel.dev/image-pull-secret: ""
+    type: kubernetes.io/dockerconfigjson
+    data:
+      .dockerconfigjson: e30K
 
----
-apiVersion: v1
-kind: ServiceAccount
-metadata:
-  name: default #! use value from "Install Default Supply Chain"
-  namespace: #@ tenant
-secrets:
-  - name: image-secret
-imagePullSecrets:
-  - name: image-secret
-  - name: #@ "{}-registry-credentials".format(tenant)
+    ---
+    apiVersion: v1
+    kind: ServiceAccount
+    metadata:
+      name: default #! use value from "Install Default Supply Chain"
+      namespace: #@ user
+    secrets:
+      - name: registry-credentials
+    imagePullSecrets:
+      - name: tap-registry
+      - name: registry-credentials
 
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: Role
-metadata:
-  name: kapp-permissions
-  namespace: #@ tenant
-  annotations:
-    kapp.k14s.io/change-group: "role"
-rules:
-- apiGroups: [source.toolkit.fluxcd.io]
-  resources: [gitrepositories]
-  verbs: ['*']
-- apiGroups: [source.apps.tanzu.vmware.com]
-  resources: [imagerepositories]
-  verbs: ['*']
-- apiGroups: [carto.run]
-  resources: [workloads, deliverables, runnables]
-  verbs: ['*']
-- apiGroups: [kpack.io]
-  resources: [images]
-  verbs: ['*']
-- apiGroups: [conventions.apps.tanzu.vmware.com]
-  resources: [podintents]
-  verbs: ['*']
-- apiGroups: [""]
-  resources: ['configmaps', 'secrets']
-  verbs: ['*']
-- apiGroups: [""]
-  resources: ['pods']
-  verbs: ['list']
-- apiGroups: [tekton.dev]
-  resources: [taskruns, pipelineruns]
-  verbs: ['*']
-- apiGroups: [tekton.dev]
-  resources: [pipelines]
-  verbs: ['list']
-- apiGroups: [kappctrl.k14s.io]
-  resources: [apps]
-  verbs: ['*']
-- apiGroups: [serving.knative.dev]
-  resources: ['services']
-  verbs: ['*']
-- apiGroups: [servicebinding.io]
-  resources: ['servicebindings']
-  verbs: ['*']
-- apiGroups: [services.apps.tanzu.vmware.com]
-  resources: ['resourceclaims']
-  verbs: ['*']
-- apiGroups: [scanning.apps.tanzu.vmware.com]
-  resources: ['imagescans', 'sourcescans', 'scantemplates']
-  verbs: ['*']
-- apiGroups:
-    - packaging.carvel.dev
-  resources: ['packageinstalls']
-  verbs: ['*']
-- apiGroups:
-    - rabbitmq.com
-  resources: ['rabbitmqclusters']
-  verbs: ['*']
-- apiGroups:
-  - ""
-  resources: ["bindings","configmaps","endpoints","events","limitranges","persistentvolumeclaims","pods","pods/attach","pods/log","pods/exec","pods/portforward","pods/status","pods/proxy","podtemplates","replicationcontrollers","resourcequotas","secrets","serviceaccounts","services","services/proxy"]
-  verbs:
-  - "*"
-- apiGroups:
-    - ""
-  resources:
-    - nodes
-  verbs:
-    - list
-- apiGroups: ["apps","autoscaling","batch","cert-manager.io","discovery.k8s.io","events.k8s.io","extensions","externaldns.k8s.io","kappctrl.k14s.io","kpack.io","metrics.k8s.io","monitoring.coreos.com","networking.k8s.io","packaging.carvel.dev","policy","projectcontour.io","rabbitmq.com","secretgen.carvel.dev","secretgen.k14s.io","velero.io"]
-  resources:
-  - "*"
-  verbs:
-  - "*"
-- apiGroups:
-  - secretgen.k14s.io
-  resources:
-  - passwords
-  verbs:
-  - "*"
-- apiGroups:
-  - sso.apps.tanzu.vmware.com
-  resources:
-  - clientregistrations
-  verbs:
-  - "*"
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: RoleBinding
-metadata:
-  name: default-developer-permissions
-  namespace: #@ tenant
-  annotations:
-    kapp.k14s.io/change-rule: "upsert after upserting role"
-    kapp.k14s.io/update-strategy:
-roleRef:
-  apiGroup: rbac.authorization.k8s.io
-  kind: Role
-  name: kapp-permissions
-subjects:
-  - kind: ServiceAccount
-    name: default #! use value from "Install Default Supply Chain"
-    namespace: #@ tenant
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: RoleBinding
-metadata:
-  name: #@ "{}-developer-permissions".format(tenant)
-  namespace: #@ tenant
-  annotations:
-    kapp.k14s.io/change-rule: "upsert after upserting role"
-    kapp.k14s.io/update-strategy:
-roleRef:
-  apiGroup: rbac.authorization.k8s.io
-  kind: Role
-  name: kapp-permissions
-subjects:
-  - kind: ServiceAccount
-    name: #@ tenant
-    namespace: #@ tenant
----
-apiVersion: cert-manager.io/v1alpha2
-kind: Certificate
-metadata:
-  name: #@ "{}.{}".format(tenant, data.values.domain)
-  namespace: #@ "{}".format(tenant)
-spec:
-  secretName: #@ "{}.{}".format(tenant, data.values.domain)
-  issuerRef:
-    name: letsencrypt-issuer
-    kind: ClusterIssuer
-  dnsNames:
-  - #@ "*.{}.{}".format(tenant, data.values.domain)
----
-apiVersion: projectcontour.io/v1
-kind: TLSCertificateDelegation
-metadata:
-  name: #@ "{}.{}".format(tenant, data.values.domain)
-  namespace: #@ tenant
-spec:
-  delegations:
-    - secretName: #@ "{}.{}".format(tenant, data.values.domain)
-      targetNamespaces:
-        - "*"
+    ---
+    apiVersion: rbac.authorization.k8s.io/v1
+    kind: Role
+    metadata:
+      name: kapp-permissions
+      namespace: #@ user
+      annotations:
+        kapp.k14s.io/change-group: "role"
+    rules:
+    - apiGroups:
+        - packaging.carvel.dev
+      resources: ['packageinstalls']
+      verbs: ['*']
+    ---
+    apiVersion: rbac.authorization.k8s.io/v1
+    kind: RoleBinding
+    metadata:
+      name: default-developer-permissions
+      namespace: #@ user
+      annotations:
+        kapp.k14s.io/change-rule: "upsert after upserting role"
+        kapp.k14s.io/update-strategy:
+    roleRef:
+      apiGroup: rbac.authorization.k8s.io
+      kind: Role
+      name: kapp-permissions
+    subjects:
+      - kind: ServiceAccount
+        name: default #! use value from "Install Default Supply Chain"
+        namespace: #@ user
+    ---
+    apiVersion: rbac.authorization.k8s.io/v1
+    kind: RoleBinding
+    metadata:
+      name: default-permit-deliverable
+      namespace: #@ user
+    roleRef:
+      apiGroup: rbac.authorization.k8s.io
+      kind: ClusterRole
+      name: deliverable
+    subjects:
+      - kind: ServiceAccount
+        name: default #! use value from "Install Default Supply Chain"
+        namespace: #@ user
+    ---
+    apiVersion: rbac.authorization.k8s.io/v1
+    kind: RoleBinding
+    metadata:
+      name: default-permit-workload
+      namespace: #@ user
+    roleRef:
+      apiGroup: rbac.authorization.k8s.io
+      kind: ClusterRole
+      name: workload
+    subjects:
+      - kind: ServiceAccount
+        name: default #! use value from "Install Default Supply Chain"
+        namespace: #@ user
+    ---
+    apiVersion: scanning.apps.tanzu.vmware.com/v1alpha1
+    kind: ScanPolicy
+    metadata:
+      name: scan-policy
+      namespace: #@ "{}".format(user)
+    spec:
+      regoFile: |
+        package policies
 
----
-apiVersion: scanning.apps.tanzu.vmware.com/v1alpha1
-kind: ScanPolicy
-metadata:
-  name: scan-policy
-  namespace: #@ "{}".format(tenant)
-spec:
-  regoFile: |
-    package policies
+        default isCompliant = false
 
-    default isCompliant = false
+        # Accepted Values: "Critical", "High", "Medium", "Low", "Negligible", "UnknownSeverity"
+        # "Critical","High","UnknownSeverity"
+        violatingSeverities := []
+        ignoreCVEs := []
 
-    # Accepted Values: "Critical", "High", "Medium", "Low", "Negligible", "UnknownSeverity"
-    # "Critical","High","UnknownSeverity"
-    violatingSeverities := []
-    ignoreCVEs := []
+        contains(array, elem) = true {
+          array[_] = elem
+        } else = false { true }
 
-    contains(array, elem) = true {
-      array[_] = elem
-    } else = false { true }
+        isSafe(match) {
+          fails := contains(violatingSeverities, match.Ratings.Rating[_].Severity)
+          not fails
+        }
 
-    isSafe(match) {
-      fails := contains(violatingSeverities, match.Ratings.Rating[_].Severity)
-      not fails
-    }
+        isSafe(match) {
+          ignore := contains(ignoreCVEs, match.Id)
+          ignore
+        }
 
-    isSafe(match) {
-      ignore := contains(ignoreCVEs, match.Id)
-      ignore
-    }
-
-    isCompliant = isSafe(input.currentVulnerability)
-
----
-apiVersion: packaging.carvel.dev/v1alpha1
-kind: PackageInstall
-metadata:
-  name: grype
-  namespace: #@ "{}".format(tenant)
-spec:
-  serviceAccountName: default
-  packageRef:
-    refName: grype.scanning.apps.tanzu.vmware.com
-    versionSelection:
-      constraints: ">=0.0.0"
-      prereleases:
-        identifiers: [beta, build]
-  values:
-  - secretRef:
-      name: grype-values
----
-apiVersion: v1
-kind: Secret
-metadata:
-  name: grype-values
-  namespace: #@ "{}".format(tenant)
-stringData:
-  values.yaml: #@ yaml.encode({ "namespace": tenant, "scanner": { "pullSecret": "" }, "targetImagePullSecret": "image-secret" })
----
-apiVersion: tekton.dev/v1beta1
-kind: Pipeline
-metadata:
-  name: developer-defined-tekton-pipeline
-  namespace: #@ "{}".format(tenant)
-  labels:
-    apps.tanzu.vmware.com/pipeline: test
-spec:
-  params:
-    - name: source-url
-    - name: source-revision
-  tasks:
-    - name: test
+        isCompliant = isSafe(input.currentVulnerability)
+    ---
+    apiVersion: packaging.carvel.dev/v1alpha1
+    kind: PackageInstall
+    metadata:
+      name: #@ "grype-{}".format(user)
+      namespace: tap-install
+    spec:
+      packageRef:
+        refName: grype.scanning.apps.tanzu.vmware.com
+        versionSelection:
+          constraints: 1.1.0
+      serviceAccountName: tap-tap-install-sa
+      values:
+      - secretRef:
+          name: #@ "grype-values-{}".format(user)
+    ---
+    apiVersion: v1
+    kind: Secret
+    metadata:
+      name: #@ "grype-values-{}".format(user)
+      namespace: tap-install
+    stringData:
+      values.yaml: #@ yaml.encode({ "namespace": user, "targetImagePullSecret": "registry-credentials" })
+    ---
+    apiVersion: tekton.dev/v1beta1
+    kind: Pipeline
+    metadata:
+      name: developer-defined-tekton-pipeline
+      namespace: #@ "{}".format(user)
+      labels:
+        apps.tanzu.vmware.com/pipeline: test
+    spec:
       params:
         - name: source-url
-          value: $(params.source-url)
         - name: source-revision
-          value: $(params.source-revision)
-      taskSpec:
-        params:
-          - name: source-url
-          - name: source-revision
-        steps:
-          - name: test
-            image: registry.govcloud.futures.army/tac-federal-apple/containers/with-dod-certs/gradle@sha256:2d4b7e280f3d3841322986ca5a708ac6966965b38dd7f193a7e3025958f6c0e2
-            script: |-
-              cd `mktemp -d`
+      tasks:
+        - name: test
+          params:
+            - name: source-url
+              value: $(params.source-url)
+            - name: source-revision
+              value: $(params.source-revision)
+          taskSpec:
+            params:
+              - name: source-url
+              - name: source-revision
+            steps:
+              - name: test
+                image: gradle
+                script: |-
+                  cd `mktemp -d`
 
-              wget -qO- $(params.source-url) | tar xvz
-              ./gradlew test
+                  wget -qO- $(params.source-url) | tar xvz -m
+                  ./mvnw test
 
-#@ registry_url = data.values.container_registry_location
-#@ registry_tenantname = data.values.container_registry_tenantname
-#@ registry_password = data.values.container_registry_password
-#@ docker_auth = base64.encode("{}:{}".format(registry_tenantname, registry_password))
-#@ docker_creds = {"tenantname": registry_tenantname, "password": registry_password, "auth": docker_auth}
+    #@ registry_url = data.values.container_registry_location
+    #@ registry_username = data.values.container_registry_username
+    #@ registry_password = data.values.container_registry_password
+    #@ docker_auth = base64.encode("{}:{}".format(registry_username, registry_password))
+    #@ docker_creds = {"username": registry_username, "password": registry_password, "auth": docker_auth}
 
----
-apiVersion: v1
-data:
-  .dockerconfigjson: #@ base64.encode(json.encode({"auths": {registry_url: docker_creds}}))
-kind: Secret
-metadata:
-  name: image-secret
-  namespace: #@ "{}".format(tenant)
-type: kubernetes.io/dockerconfigjson
----
-apiVersion: v1
-kind: Secret
-metadata:
-  name: gitlab-read-access
-  namespace: #@ "{}".format(tenant)
-  annotations:
-    tekton.dev/git-0: #@ data.values.gitlab_url
-type: kubernetes.io/basic-auth
-stringData:
-  tenantname: #@ data.values.gitlab_tenantname
-  password: #@ data.values.gitlab_access_token
-#@ end
+    ---
+    apiVersion: v1
+    data:
+      .dockerconfigjson: #@ base64.encode(json.encode({"auths": {registry_url: docker_creds}}))
+    kind: Secret
+    metadata:
+      name: registry-credentials
+      namespace: #@ "{}".format(user)
+    type: kubernetes.io/dockerconfigjson
+    ---
+    apiVersion: v1
+    kind: Secret
+    metadata:
+      name: git-ssh
+      namespace: #@ "{}".format(user)
+      annotations:
+        tekton.dev/git-0: #@ data.values.git_url
+    type: kubernetes.io/ssh-auth
+    data:
+      identity: #@ data.values.git_ssh_private
+      identity.pub: #@ data.values.git_ssh_public
+      known_hosts: #@ data.values.git_ssh_known_hosts
+      ssh-privatekey: #@ data.values.git_ssh_private
+    #@ end
