@@ -29,6 +29,7 @@ jobs:
       - name: Pull cli
         run: |
           brew install pivotal/tap/pivnet-cli
+          whoami
           PRODUCT_ID=1190781; #linux
           pivnet download-product-files --product-slug='tanzu-application-platform' --release-version='1.1.1' --product-file-id=$PRODUCT_ID
           mkdir tanzu
