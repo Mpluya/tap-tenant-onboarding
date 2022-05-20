@@ -28,8 +28,8 @@ jobs:
       # Runs a single command using the runners shell
       - name: Pull cli
         run: |
-          brew install pivotal/tap/pivnet-cli
-          whoami
+          wget -O pivnet github.com/pivotal-cf/pivnet-cli/releases/download/v0.0.55/pivnet-linux-amd64-3.0.1 && chmod +x pivnet && sudo mv pivnet /usr/local/bin
+
           PRODUCT_ID=1190781; #linux
           pivnet download-product-files --product-slug='tanzu-application-platform' --release-version='1.1.1' --product-file-id=$PRODUCT_ID
           mkdir tanzu
