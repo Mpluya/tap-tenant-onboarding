@@ -30,7 +30,8 @@ jobs:
         run: |
           wget -O pivnet github.com/pivotal-cf/pivnet-cli/releases/download/v3.0.1/pivnet-linux-amd64-3.0.1 && chmod +x pivnet && sudo mv pivnet /usr/local/bin
 
-          PRODUCT_ID=1190781; #linux
+          PRODUCT_ID=1212839; #linux
+          pivnet login --api-token=$API_TOKEN
           pivnet download-product-files --product-slug='tanzu-application-platform' --release-version='1.1.1' --product-file-id=$PRODUCT_ID
           mkdir tanzu
           tar -xvf "tanzu-framework-$PRODUCT_ID-amd64.tar" -C tanzu
