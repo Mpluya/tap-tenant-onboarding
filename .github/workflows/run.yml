@@ -39,7 +39,7 @@ jobs:
           tar -xvf "tanzu-framework-linux-amd64.tar" -C tanzu
           export TANZU_CLI_NO_INIT=true
           cd tanzu
-          sudo install "cli/core/v0.11.2/tanzu-core-linux_amd64" /usr/local/bin/tanzu
+          sudo install "cli/core/v0.11.4/tanzu-core-linux_amd64" /usr/local/bin/tanzu
           tanzu version
 
           tanzu plugin install --local cli all
