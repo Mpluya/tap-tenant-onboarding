@@ -15,32 +15,24 @@ on:
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  # This workflow contains a single job called "build"
-  build:
+  
+  checkout-and-generate:
     # The type of runner that the job will run on
+    name: checkout and generate
     runs-on: ubuntu-latest
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v3
+      - name: checkout
+        uses: actions/checkout@v3
 
       # Runs a single command using the runners shell
-      - name: Pull cli
-        env: # Or as an environment variable
-          API_TOKEN: ${{ secrets.API_TOKEN }}
-        run: |
-          wget -O pivnet github.com/pivotal-cf/pivnet-cli/releases/download/v3.0.1/pivnet-linux-amd64-3.0.1 && chmod +x pivnet && sudo mv pivnet /usr/local/bin
-
-          PRODUCT_ID=1212839 #linux
-          pivnet login --api-token=$API_TOKEN
-          pivnet download-product-files --product-slug='tanzu-application-platform' --release-version='1.1.1' --product-file-id=$PRODUCT_ID
-          mkdir tanzu
-          tar -xvf "tanzu-framework-linux-amd64.tar" -C tanzu
-          export TANZU_CLI_NO_INIT=true
-          cd tanzu
-          sudo install "cli/core/v0.11.4/tanzu-core-linux_amd64" /usr/local/bin/tanzu
-          tanzu version
-
-          tanzu plugin install --local cli all
-          tanzu plugin list
+      - name: generate
+        uses: endaft/action-yamler@v1.0.5
+        with:
+          file: ./values.yaml
+          path: additional_users
+          set: "- mae"
+          get: true
+          append: true
