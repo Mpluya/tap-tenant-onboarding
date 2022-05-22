@@ -31,7 +31,7 @@ jobs:
       - name: generate
         uses: endaft/action-yamler@v1.0.5
         with:
-          file: ./values.yaml
+          file: ./values.yml
           path: additional_users
           set: "- mae"
           get: true
