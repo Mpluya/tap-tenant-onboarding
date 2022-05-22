@@ -36,3 +36,7 @@ jobs:
           set: "- mae"
           get: true
           append: true
+      
+      - name: check
+        run: |
+          cat ./values.yml
