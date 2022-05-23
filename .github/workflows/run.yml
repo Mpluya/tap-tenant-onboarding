@@ -33,7 +33,7 @@ jobs:
         with:
           file: ./values.yml
           path: additional_users
-          set: "- mae"
+          set: "\n \- mae"
           get: true
           append: true
       
