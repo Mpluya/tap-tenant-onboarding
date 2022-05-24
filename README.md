@@ -5,5 +5,6 @@ The [internal repo](https://gitlab.eng.vmware.com/rvanvoorhees/kapp-controller-t
 
 ## Deploy command:
 ```
-kapp deploy --yes -a tap-tenants -f <(ytt -f .)
+kapp deploy --yes -a tap-tenants -c \
+-f <(ytt --ignore-unknown-comments -f app-onboarding.yml -f values.yml -f config/app-onboarding-secrets.yml)
 ```
