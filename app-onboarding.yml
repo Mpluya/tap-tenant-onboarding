@@ -71,7 +71,7 @@ stringData:
     secrets:
       - name: registry-credentials
       - name: cosign
-      - name: git-ssh
+      - name: gitops-ssh
     imagePullSecrets:
       - name: tap-registry
       - name: registry-credentials
@@ -410,7 +410,7 @@ stringData:
     apiVersion: v1
     kind: Secret
     metadata:
-      name: git-ssh
+      name: gitops-ssh
       namespace: #@ "{}".format(user)
       annotations:
         tekton.dev/git-0: #@ data.values.git_url
