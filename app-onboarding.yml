@@ -4,6 +4,8 @@
 apiVersion: kappctrl.k14s.io/v1alpha1
 kind: App
 metadata:
+  annotations:
+    kapp.k14s.io/disable-wait: ""
   name: app-onboarding
   namespace: tap-install
 spec:
@@ -24,7 +26,9 @@ spec:
   - kbld: {}
   deploy:
   - kapp: 
-      rawOptions: ["--dangerous-override-ownership-of-existing-resources=true"]
+      rawOptions: 
+      - --diff-changes=true
+      - --dangerous-override-ownership-of-existing-resources=true
 ---
 apiVersion: v1
 kind: Secret
@@ -185,27 +189,36 @@ stringData:
         apps.tanzu.vmware.com/pipeline: test
     spec:
       params:
-        - name: source-url
-        - name: source-revision
+      - name: source-url
+      - name: source-revision
+      workspaces:
+      - name: pipeline-cache
       tasks:
-        - name: test
+      - name: test
+        params:
+        - name: source-url
+          value: $(params.source-url)
+        - name: source-revision
+          value: $(params.source-revision)
+        workspaces:
+        - name: pipeline-cache
+          workspace: pipeline-cache
+        taskSpec:
           params:
-            - name: source-url
-              value: $(params.source-url)
-            - name: source-revision
-              value: $(params.source-revision)
-          taskSpec:
-            params:
-              - name: source-url
-              - name: source-revision
-            steps:
-              - name: test
-                image: gradle
-                script: |-
-                  cd `mktemp -d`
-
-                  wget -qO- $(params.source-url) | tar xvz -m
-                  ./mvnw test
+          - name: source-url
+          - name: source-revision
+          workspaces:
+          - name: pipeline-cache
+          steps:
+            - name: test
+              image: gradle
+              script: |-
+                set -ex
+                rm -rf ~/.m2
+                ln -fs $(workspaces.pipeline-cache.path) ~/.m2
+                cd `mktemp -d`
+                wget -qO- $(params.source-url) | tar xvz -m
+                ./mvnw test
 
     #@ registry_url = data.values.container_registry_location
     #@ registry_username = data.values.container_registry_username
