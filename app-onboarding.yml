@@ -168,6 +168,37 @@ stringData:
       values.yaml: #@ yaml.encode({ "namespace": user, "targetImagePullSecret": "registry-credentials" })
     ---
     apiVersion: v1
+    data:
+      snyk_token: #@ snyk_token
+    kind: Secret
+    metadata:
+      name: snyk-token-secret
+       namespace: #@ user
+    ---
+    apiVersion: packaging.carvel.dev/v1alpha1
+    kind: PackageInstall
+    metadata:
+      name: #@ "snyk-{}".format(user)
+      namespace: tap-install
+    spec:
+      packageRef:
+        refName: snyk.scanning.apps.tanzu.vmware.com
+        versionSelection:
+          constraints: 1.0.0-beta.2
+      serviceAccountName: tap-tap-install-sa
+      values:
+      - secretRef:
+          name: #@ "snyk-values-{}".format(user)
+    ---
+    apiVersion: v1
+    kind: Secret
+    metadata:
+      name: #@ "snyk-values-{}".format(user)
+      namespace: tap-install
+    stringData:
+      values.yaml: #@ yaml.encode({ "namespace": user, "targetImagePullSecret": "registry-credentials",  "snyk": {"tokenSecret": {"name": "snyk-token-secret"}}, "metadataStore": {"caSecret": {"importFromNamespace": ""},"authSecret": {"importFromNamespace": ""}} })
+    ---
+    apiVersion: v1
     kind: Secret
     metadata:
       name: cosign
@@ -225,6 +256,7 @@ stringData:
     #@ registry_password = data.values.container_registry_password
     #@ docker_auth = base64.encode("{}:{}".format(registry_username, registry_password))
     #@ docker_creds = {"username": registry_username, "password": registry_password, "auth": docker_auth}
+    #@ snyk_token = data.values.snyk_token
 
     ---
     apiVersion: v1
