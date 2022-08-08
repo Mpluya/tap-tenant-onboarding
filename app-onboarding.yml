@@ -212,6 +212,18 @@ stringData:
       cosign.password: #@ data.values.cosign_password
       cosign.pub: #@ data.values.cosign_public
     ---
+    apiVersion: v1
+    kind: PersistentVolumeClaim
+    metadata:
+      name: #@ "{}-pipeline-cache".format(user)
+    spec:
+      accessModes:
+      - ReadWriteOnce
+      storageClassName: azurefile
+      resources:
+        requests:
+          storage: 2Gi
+    ---
     apiVersion: tekton.dev/v1beta1
     kind: Pipeline
     metadata:
