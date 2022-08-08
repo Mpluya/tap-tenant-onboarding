@@ -216,6 +216,7 @@ stringData:
     kind: PersistentVolumeClaim
     metadata:
       name: #@ "{}-pipeline-cache".format(user)
+      namespace: #@ "{}".format(user)
     spec:
       accessModes:
       - ReadWriteOnce
