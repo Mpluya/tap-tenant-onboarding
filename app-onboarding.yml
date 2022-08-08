@@ -1,5 +1,6 @@
 #@ load("@ytt:data", "data")
 #@ load("@ytt:yaml", "yaml")
+#@ load("@ytt:base64", "base64")
 ---
 apiVersion: kappctrl.k14s.io/v1alpha1
 kind: App
@@ -169,11 +170,11 @@ stringData:
     ---
     apiVersion: v1
     data:
-      snyk_token: #@ snyk_token
+      snyk_token: #@ base64.encode(data.values.snyk_api_token) 
     kind: Secret
     metadata:
       name: snyk-token-secret
-       namespace: #@ user
+      namespace: #@ "{}".format(user)
     ---
     apiVersion: packaging.carvel.dev/v1alpha1
     kind: PackageInstall
@@ -256,8 +257,6 @@ stringData:
     #@ registry_password = data.values.container_registry_password
     #@ docker_auth = base64.encode("{}:{}".format(registry_username, registry_password))
     #@ docker_creds = {"username": registry_username, "password": registry_password, "auth": docker_auth}
-    #@ snyk_token = data.values.snyk_token
-
     ---
     apiVersion: v1
     data:

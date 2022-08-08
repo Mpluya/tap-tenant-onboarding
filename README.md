@@ -5,8 +5,8 @@ The [internal repo](https://gitlab.eng.vmware.com/rvanvoorhees/kapp-controller-t
 
 ## Deploy command:
 ```
-kapp deploy --wait-check-interval=1m -n tap-install --yes -a tap-tenants -c \
--f <(ytt --ignore-unknown-comments -f app-onboarding.yml -f values.yml -f ./app-onboarding-secrets.yml)
+kapp deploy -n tap-install --yes -a tap-tenants -c \
+-f <(ytt --ignore-unknown-comments -f app-onboarding.yml -f values.yml -f ./app-onboarding-secrets-sealed.yml)
 ```
 
 Note: app-onboarding-secrets-sealed.yml is a result of running the command below. Automatic decryption happens in the intended cluster, where kubeseal controller is running:
