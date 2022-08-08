@@ -55,13 +55,13 @@ stringData:
     apiVersion: v1
     kind: Namespace
     metadata:
-      name: #@ user
+      name: #@ user.namespace
     ---
     apiVersion: v1
     kind: Secret
     metadata:
       name: tap-registry
-      namespace: #@ user
+      namespace: #@ user.namespace
       annotations:
         secretgen.carvel.dev/image-pull-secret: ""
     type: kubernetes.io/dockerconfigjson
@@ -73,7 +73,7 @@ stringData:
     kind: ServiceAccount
     metadata:
       name: default #! use value from "Install Default Supply Chain"
-      namespace: #@ user
+      namespace: #@ user.namespace
     secrets:
       - name: registry-credentials
       - name: cosign
@@ -86,7 +86,7 @@ stringData:
     kind: RoleBinding
     metadata:
       name: default-permit-deliverable
-      namespace: #@ user
+      namespace: #@ user.namespace
     roleRef:
       apiGroup: rbac.authorization.k8s.io
       kind: ClusterRole
@@ -94,13 +94,13 @@ stringData:
     subjects:
       - kind: ServiceAccount
         name: default #! use value from "Install Default Supply Chain"
-        namespace: #@ user
+        namespace: #@ user.namespace
     ---
     apiVersion: rbac.authorization.k8s.io/v1
     kind: RoleBinding
     metadata:
       name: default-permit-workload
-      namespace: #@ user
+      namespace: #@ user.namespace
     roleRef:
       apiGroup: rbac.authorization.k8s.io
       kind: ClusterRole
@@ -108,13 +108,29 @@ stringData:
     subjects:
       - kind: ServiceAccount
         name: default #! use value from "Install Default Supply Chain"
-        namespace: #@ user
+        namespace: #@ user.namespace
+    ---
+    #@ if "viewer" in user:
+    apiVersion: rbac.authorization.k8s.io/v1
+    kind: RoleBinding
+    metadata:
+      name: app-viewer
+      namespace: #@ user.namespace
+    roleRef:
+      apiGroup: rbac.authorization.k8s.io
+      kind: ClusterRole
+      name: app-viewer
+    subjects:
+    - apiGroup: rbac.authorization.k8s.io
+      kind: Group
+      name: #@ user.viewer
+    #@ end
     ---
     apiVersion: scanning.apps.tanzu.vmware.com/v1alpha1
     kind: ScanPolicy
     metadata:
       name: scan-policy
-      namespace: #@ "{}".format(user)
+      namespace: #@ "{}".format(user.namespace)
     spec:
       regoFile: |
         package main
@@ -148,7 +164,7 @@ stringData:
     apiVersion: packaging.carvel.dev/v1alpha1
     kind: PackageInstall
     metadata:
-      name: #@ "grype-{}".format(user)
+      name: #@ "grype-{}".format(user.namespace)
       namespace: tap-install
     spec:
       packageRef:
@@ -158,15 +174,15 @@ stringData:
       serviceAccountName: tap-tap-install-sa
       values:
       - secretRef:
-          name: #@ "grype-values-{}".format(user)
+          name: #@ "grype-values-{}".format(user.namespace)
     ---
     apiVersion: v1
     kind: Secret
     metadata:
-      name: #@ "grype-values-{}".format(user)
+      name: #@ "grype-values-{}".format(user.namespace)
       namespace: tap-install
     stringData:
-      values.yaml: #@ yaml.encode({ "namespace": user, "targetImagePullSecret": "registry-credentials" })
+      values.yaml: #@ yaml.encode({ "namespace": user.namespace, "targetImagePullSecret": "registry-credentials" })
     ---
     apiVersion: v1
     data:
@@ -174,12 +190,12 @@ stringData:
     kind: Secret
     metadata:
       name: snyk-token-secret
-      namespace: #@ "{}".format(user)
+      namespace: #@ "{}".format(user.namespace)
     ---
     apiVersion: packaging.carvel.dev/v1alpha1
     kind: PackageInstall
     metadata:
-      name: #@ "snyk-{}".format(user)
+      name: #@ "snyk-{}".format(user.namespace)
       namespace: tap-install
     spec:
       packageRef:
@@ -189,27 +205,27 @@ stringData:
       serviceAccountName: tap-tap-install-sa
       values:
       - secretRef:
-          name: #@ "snyk-values-{}".format(user)
+          name: #@ "snyk-values-{}".format(user.namespace)
     ---
     apiVersion: v1
     kind: Secret
     metadata:
-      name: #@ "snyk-values-{}".format(user)
+      name: #@ "snyk-values-{}".format(user.namespace)
       namespace: tap-install
     stringData:
-      values.yaml: #@ yaml.encode({ "namespace": user, "targetImagePullSecret": "registry-credentials",  "snyk": {"tokenSecret": {"name": "snyk-token-secret"}}, "metadataStore": {"caSecret": {"importFromNamespace": ""},"authSecret": {"importFromNamespace": ""}} })
+      values.yaml: #@ yaml.encode({ "namespace": user.namespace, "targetImagePullSecret": "registry-credentials",  "snyk": {"tokenSecret": {"name": "snyk-token-secret"}}, "metadataStore": {"caSecret": {"importFromNamespace": ""},"authSecret": {"importFromNamespace": ""}} })
     ---
     apiVersion: scanning.apps.tanzu.vmware.com/v1beta1
     kind: ScanPolicy
     metadata:
       name: snyk-scan-policy
-      namespace: #@ "{}".format(user)
+      namespace: #@ "{}".format(user.namespace)
     spec:
       regoFile: |
         package main
 
         notAllowedSeverities := ["Critical"]
-        ignoreCves := []
+        ignoreCves := [""]
 
         contains(array, elem) = true {
           array[_] = elem
@@ -237,7 +253,7 @@ stringData:
     kind: Secret
     metadata:
       name: cosign
-      namespace: #@ user
+      namespace: #@ user.namespace
       annotations:
         kpack.io/cosign.docker-media-types: "1"
     type: Opaque
@@ -249,8 +265,8 @@ stringData:
     apiVersion: v1
     kind: PersistentVolumeClaim
     metadata:
-      name: #@ "{}-pipeline-cache".format(user)
-      namespace: #@ "{}".format(user)
+      name: #@ "{}-pipeline-cache".format(user.namespace)
+      namespace: #@ "{}".format(user.namespace)
     spec:
       accessModes:
       - ReadWriteOnce
@@ -263,7 +279,7 @@ stringData:
     kind: Pipeline
     metadata:
       name: developer-defined-tekton-pipeline
-      namespace: #@ "{}".format(user)
+      namespace: #@ "{}".format(user.namespace)
       labels:
         apps.tanzu.vmware.com/pipeline: test
     spec:
@@ -311,14 +327,14 @@ stringData:
     kind: Secret
     metadata:
       name: registry-credentials
-      namespace: #@ "{}".format(user)
+      namespace: #@ "{}".format(user.namespace)
     type: kubernetes.io/dockerconfigjson
     ---
     apiVersion: v1
     kind: Secret
     metadata:
       name: gitops-ssh
-      namespace: #@ "{}".format(user)
+      namespace: #@ "{}".format(user.namespace)
       annotations:
         tekton.dev/git-0: #@ data.values.git_url
     type: kubernetes.io/ssh-auth
