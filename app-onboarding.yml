@@ -131,6 +131,8 @@ stringData:
     metadata:
       name: scan-policy
       namespace: #@ "{}".format(user.namespace)
+      labels:
+        app.kubernetes.io/part-of: component
     spec:
       regoFile: |
         package main
@@ -220,6 +222,8 @@ stringData:
     metadata:
       name: snyk-scan-policy
       namespace: #@ "{}".format(user.namespace)
+      labels:
+        app.kubernetes.io/part-of: component
     spec:
       regoFile: |
         package main
