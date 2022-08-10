@@ -224,7 +224,7 @@ stringData:
       regoFile: |
         package main
 
-        notAllowedSeverities := ["Critical"]
+        notAllowedSeverities := ["Critical", "Low"]
         ignoreCves := [""]
 
         contains(array, elem) = true {
