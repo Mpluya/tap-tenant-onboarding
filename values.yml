@@ -2,6 +2,5 @@
 ---
 additional_users: 
   - namespace: rehan
-    editor: 412d8561-8249-48fc-a924-fc9c4fd4ba99
-    operator: 789
+    operator: d6f8a2ce-d9c2-4130-b26c-1d35086b8422
   - namespace: mae
