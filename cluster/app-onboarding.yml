@@ -348,6 +348,7 @@ stringData:
     kind: App
     metadata:
       name: #@ "{}-addons".format(user.namespace)
+      namespace: tap-install
     spec:
       serviceAccountName: tap-tap-install-sa
       fetch:
