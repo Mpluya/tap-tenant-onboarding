@@ -344,7 +344,6 @@ stringData:
       known_hosts: #@ data.values.git_ssh_known_hosts
       ssh-privatekey: #@ data.values.git_ssh_private
     ---
-    #@ load("@ytt:data", "data")
     apiVersion: kappctrl.k14s.io/v1alpha1
     kind: App
     metadata:
@@ -364,6 +363,7 @@ stringData:
             inline:
               paths:
                 overlay.yaml: |
+                  #@ load("@ytt:data", "data")
                   #@ load("@ytt:overlay", "overlay")
                   #@overlay/match by=overlay.all, expects="1+"
                   ---
