@@ -1,7 +1,3 @@
-#@data/values
----
-namespace: rehan 
----
 #@ load("@ytt:data", "data")
 #@ load("@ytt:overlay", "overlay")
 #@overlay/match by=overlay.all, expects="1+"
