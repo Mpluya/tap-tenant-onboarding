@@ -343,4 +343,33 @@ stringData:
       identity.pub: #@ data.values.git_ssh_public
       known_hosts: #@ data.values.git_ssh_known_hosts
       ssh-privatekey: #@ data.values.git_ssh_private
+    ---
+    apiVersion: kappctrl.k14s.io/v1alpha1
+    kind: App
+    metadata:
+      name: #@ "{}-addons".format(user.namespace)
+    spec:
+      serviceAccountName: tap-tap-install-sa
+      fetch:
+      - git:
+          url: ssh://git@github.com/Mpluya/tap-tenant-onboarding
+          ref: origin/custom
+          subPath: #@ "tenants/{}".format(user.namespace)
+          secretRef: 
+            name: tap-install-gitops-ssh
+      template:
+        - ytt:
+            inline:
+              paths:
+                overlay.yaml: |
+                  #@ load("@ytt:overlay", "overlay")
+                  #@overlay/match by=overlay.all, expects="1+"
+                  ---
+                  metadata:
+                    #@overlay/match missing_ok=True
+                    namespace: #@ "{}".format(user.namespace)
+      deploy:
+      - kapp:
+          rawOptions:
+          - --diff-changes=true
     #@ end
