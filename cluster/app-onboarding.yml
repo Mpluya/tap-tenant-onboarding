@@ -352,6 +352,16 @@ stringData:
     spec:
       serviceAccountName: tap-tap-install-sa
       fetch:
+      - inline:
+          paths:
+            overlay.yaml: |
+              #@ load("@ytt:data", "data")
+              #@ load("@ytt:overlay", "overlay")
+              #@overlay/match by=overlay.all, expects="1+"
+              ---
+              metadata:
+                #@overlay/match missing_ok=True
+                namespace: #@ "{}".format(user.namespace)
       - git:
           url: ssh://git@github.com/Mpluya/tap-tenant-onboarding
           ref: origin/custom
