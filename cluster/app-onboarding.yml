@@ -352,16 +352,6 @@ stringData:
     spec:
       serviceAccountName: tap-tap-install-sa
       fetch:
-      - inline:
-          paths:
-            overlay.yaml: |
-              #@ load("@ytt:data", "data")
-              #@ load("@ytt:overlay", "overlay")
-              #@overlay/match by=overlay.all, expects="1+"
-              ---
-              metadata:
-                #@overlay/match missing_ok=True
-                namespace: #@ "{}".format(user.namespace)
       - git:
           url: ssh://git@github.com/Mpluya/tap-tenant-onboarding
           ref: origin/custom
@@ -369,9 +359,30 @@ stringData:
           secretRef: 
             name: tap-install-gitops-ssh
       template:
-        - ytt: {}
+        - ytt:
+          ignoreUnknownComments: true
+          inline:
+            paths:
+              overlay.yaml: |
+                #@ load("@ytt:data", "data")
+                #@ load("@ytt:overlay", "overlay")
+                #@overlay/match by=overlay.all, expects="1+"
+                ---
+                metadata:
+                  #@overlay/match missing_ok=True
+                  namespace: #@ data.values.namespace
+          valuesFrom:
+          - secretRef:
+              name: addons-overlay-value
       deploy:
       - kapp:
           rawOptions:
           - --diff-changes=true
+    ---
+    apiVersion: v1
+    kind: Secret
+    metadata:
+      name:  addons-overlay-value
+    stringData:
+      values.yaml: #@ yaml.encode({ "namespace": "{}".format(user.namespace) })
     #@ end
