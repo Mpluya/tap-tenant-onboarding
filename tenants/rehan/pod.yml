@@ -3,6 +3,7 @@ kind: Pod
 metadata:
   labels:
     run: test
+  namespace: mae
   name: test
 spec:
   containers:
