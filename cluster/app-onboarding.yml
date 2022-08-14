@@ -369,7 +369,7 @@ stringData:
                 ---
                 metadata:
                   #@overlay/match missing_ok=True
-                  namespace: #@ user.namespace
+                  namespace: #@ "{}".format(user.namespace)
       deploy:
       - kapp:
           rawOptions:
