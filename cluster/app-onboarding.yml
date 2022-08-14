@@ -362,7 +362,7 @@ stringData:
       - ytt:
           inline:
             paths:
-              values.yaml: #@ "#@data/values\n---\nnamespace:{}".format(user.namespace)   
+              values.yaml: #@ "#@data/values\n---\n---namespace:{}".format(user.namespace)   
       deploy:
       - kapp:
           rawOptions:
