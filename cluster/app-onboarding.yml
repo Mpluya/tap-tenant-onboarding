@@ -364,7 +364,6 @@ stringData:
           inline:
             paths:
               overlay.yaml: |
-                #@ load("@ytt:data", "data")
                 #@ load("@ytt:overlay", "overlay")
                 #@overlay/match by=overlay.all, expects="1+"
                 ---
