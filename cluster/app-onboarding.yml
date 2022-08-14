@@ -362,7 +362,7 @@ stringData:
       - ytt:
           inline:
             paths:
-              ns-overlay.yaml: #@ "#@ load("@ytt:data", "data")\n#@ load("@ytt:overlay", "overlay")\n#@overlay/match by=overlay.all, expects="1+"\n---\nmetadata:\n  #@overlay/match missing_ok=True\n  namespace: {}".format(user.namespace)
+              ns-overlay.yaml: #@ "#@ load(\"@ytt:data\", \"data\")\n#@ load(\"@ytt:overlay\", \"overlay\")\n#@overlay/match by=overlay.all, expects=\"1+\"\n---\nmetadata:\n  #@overlay/match missing_ok=True\n  namespace: {}".format(user.namespace)
       deploy:
       - kapp:
           rawOptions:
