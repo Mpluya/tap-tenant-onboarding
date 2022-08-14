@@ -365,7 +365,7 @@ stringData:
               values.yaml: |
                 #@data/values
                 ---
-                namespace: test    
+                namespace: #@ user.namespace    
       deploy:
       - kapp:
           rawOptions:
