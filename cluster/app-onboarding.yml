@@ -359,17 +359,13 @@ stringData:
           secretRef: 
             name: tap-install-gitops-ssh
       template:
-        - ytt:
-          ignoreUnknownComments: true
+      - ytt:
           inline:
             paths:
-              overlay.yaml: |
-                #@ load("@ytt:overlay", "overlay")
-                #@overlay/match by=overlay.all, expects="1+"
+              values.yaml: |
+                #@data/values
                 ---
-                metadata:
-                  #@overlay/match missing_ok=True
-                  namespace: #@ "{}".format(user.namespace)
+                namespace: test    
       deploy:
       - kapp:
           rawOptions:
