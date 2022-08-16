@@ -1,7 +1,7 @@
 apiVersion: tekton.dev/v1beta1
 kind: Pipeline
 metadata:
-  name: pipeline
+  name: developer-defined-tekton-pipeline
 spec:
   params:
   - name: source-url
