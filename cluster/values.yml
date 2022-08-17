@@ -3,6 +3,7 @@
 additional_users: 
   - namespace: rehan
     editor: 412d8561-8249-48fc-a924-fc9c4fd4ba99
+    custom_resources:
   - namespace: mae
     custom_resources:
       - 'developer-defined-tekton-pipeline'
