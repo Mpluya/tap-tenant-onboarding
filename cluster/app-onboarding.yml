@@ -246,7 +246,7 @@ stringData:
       namespace: tap-install
     stringData:
       values.yaml: #@ yaml.encode({ "namespace": user.namespace, "targetImagePullSecret": "registry-credentials",  "snyk": {"tokenSecret": {"name": "snyk-token-secret"}}, "metadataStore": {"caSecret": {"importFromNamespace": ""},"authSecret": {"importFromNamespace": ""}} })
-    #@ if "custom_resources" not in user and "snyk-scan-policy" not in user.custom_resources:
+    #@ if "custom_resources" not in user or ("custom_resources" in user and "snyk-scan-policy" not in user.custom_resources):
     ---
     apiVersion: scanning.apps.tanzu.vmware.com/v1beta1
     kind: ScanPolicy
@@ -308,7 +308,7 @@ stringData:
       resources:
         requests:
           storage: 2Gi
-    #@ if "custom_resources" not in user and "developer-defined-tekton-pipeline" not in user.custom_resources:
+    #@ if "custom_resources" not in user or ("custom_resources" in user and "developer-defined-tekton-pipeline" not in user.custom_resources):
     ---
     apiVersion: tekton.dev/v1beta1
     kind: Pipeline
