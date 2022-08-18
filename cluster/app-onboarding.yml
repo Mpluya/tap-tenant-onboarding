@@ -341,7 +341,7 @@ stringData:
           - name: pipeline-cache
           steps:
             - name: test
-              image: gradle
+              image: tapsme/gradle:latest
               script: |-
                 set -ex
                 rm -rf ~/.m2
