@@ -1,7 +1,7 @@
     apiVersion: scanning.apps.tanzu.vmware.com/v1beta1
     kind: ScanPolicy
     metadata:
-      name: snyk-scan-policy
+      name: nicer-snyk-scan-policy
     spec:
       regoFile: |
         package main
