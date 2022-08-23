@@ -5,6 +5,7 @@ additional_users:
     editor: 412d8561-8249-48fc-a924-fc9c4fd4ba99
 
   - namespace: mae
-    custom_resources:
+    custom: true
+    exclude_resources:
       - 'developer-defined-tekton-pipeline'
       - 'snyk-scan-policy'

@@ -246,7 +246,7 @@ stringData:
       namespace: tap-install
     stringData:
       values.yaml: #@ yaml.encode({ "namespace": user.namespace, "targetImagePullSecret": "registry-credentials",  "snyk": {"tokenSecret": {"name": "snyk-token-secret"}}, "metadataStore": {"caSecret": {"importFromNamespace": ""},"authSecret": {"importFromNamespace": ""}} })
-    #@ if "custom_resources" not in user or ("custom_resources" in user and "snyk-scan-policy" not in user.custom_resources):
+    #@ if "exclude_resources" not in user or ("exclude_resources" in user and "snyk-scan-policy" not in user.exclude_resources):
     ---
     apiVersion: scanning.apps.tanzu.vmware.com/v1beta1
     kind: ScanPolicy
@@ -308,7 +308,7 @@ stringData:
       resources:
         requests:
           storage: 2Gi
-    #@ if "custom_resources" not in user or ("custom_resources" in user and "developer-defined-tekton-pipeline" not in user.custom_resources):
+    #@ if "exclude_resources" not in user or ("exclude_resources" in user and "developer-defined-tekton-pipeline" not in user.exclude_resources):
     ---
     apiVersion: tekton.dev/v1beta1
     kind: Pipeline
@@ -379,6 +379,7 @@ stringData:
       known_hosts: #@ data.values.git_ssh_known_hosts
       ssh-privatekey: #@ data.values.git_ssh_private
     ---
+    #@ if "custom" in user:
     apiVersion: kappctrl.k14s.io/v1alpha1
     kind: App
     metadata:
@@ -402,4 +403,5 @@ stringData:
       - kapp:
           rawOptions:
           - --diff-changes=true
+    #@ end  
     #@ end
