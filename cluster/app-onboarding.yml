@@ -56,8 +56,6 @@ stringData:
     kind: Namespace
     metadata:
       name: #@ user.namespace
-      labels:
-        policy.sigstore.dev/include: "true"
     ---
     apiVersion: v1
     kind: Secret
