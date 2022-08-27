@@ -301,7 +301,7 @@ stringData:
     apiVersion: v1
     kind: PersistentVolumeClaim
     metadata:
-      name: #@ "{}-pipeline-cache".format(user.namespace)
+      name: supplychain-pvc
       namespace: #@ "{}".format(user.namespace)
     spec:
       accessModes:
@@ -325,7 +325,7 @@ stringData:
       - name: source-revision
       workspaces:
       - name: maven-settings
-      - name: pipeline-cache
+      - name: supplychain-workspace
       tasks:
       - name: test
         params:
@@ -334,8 +334,8 @@ stringData:
         - name: source-revision
           value: $(params.source-revision)
         workspaces:
-        - name: pipeline-cache
-          workspace: pipeline-cache
+        - name: supplychain-workspace
+          workspace: supplychain-workspace
         - name: maven-settings
           workspace: maven-settings
         taskSpec:
@@ -343,7 +343,7 @@ stringData:
           - name: source-url
           - name: source-revision
           workspaces:
-          - name: pipeline-cache
+          - name: supplychain-workspace
           - name: maven-settings
           steps:
             - name: test
