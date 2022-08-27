@@ -324,6 +324,7 @@ stringData:
       - name: source-url
       - name: source-revision
       workspaces:
+      - name: maven-settings
       - name: pipeline-cache
       tasks:
       - name: test
@@ -335,22 +336,23 @@ stringData:
         workspaces:
         - name: pipeline-cache
           workspace: pipeline-cache
+        - name: maven-settings
+          workspace: maven-settings
         taskSpec:
           params:
           - name: source-url
           - name: source-revision
           workspaces:
           - name: pipeline-cache
+          - name: maven-settings
           steps:
             - name: test
               image: tapsme/gradle:latest
               script: |-
                 set -ex
-                rm -rf ~/.m2
-                ln -fs $(workspaces.pipeline-cache.path) ~/.m2
                 cd `mktemp -d`
                 wget -qO- $(params.source-url) | tar xvz -m
-                ./mvnw test
+                ./mvnw test -Dmaven.repo.local=${workspaces.maven-settings.path}
     #@ end
     #@ registry_url = data.values.container_registry_location
     #@ registry_username = data.values.container_registry_username
