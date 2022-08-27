@@ -352,7 +352,7 @@ stringData:
                 set -ex
                 cd `mktemp -d`
                 wget -qO- $(params.source-url) | tar xvz -m
-                ./mvnw test -Dmaven.repo.local=${workspaces.maven-settings.path}
+                ./mvnw test -Dmaven.repo.local=$(workspaces.maven-settings.path)
     #@ end
     #@ registry_url = data.values.container_registry_location
     #@ registry_username = data.values.container_registry_username
