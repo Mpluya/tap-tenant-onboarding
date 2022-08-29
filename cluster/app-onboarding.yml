@@ -315,6 +315,7 @@ stringData:
     kind: Pipeline
     metadata:
       name: developer-defined-tekton-pipeline-dotnet
+      namespace: #@ "{}".format(user.namespace)
       labels:
         apps.tanzu.vmware.com/pipeline: test
         apps.tanzu.vmware.com/language: dotnet
