@@ -319,6 +319,7 @@ stringData:
       namespace: #@ "{}".format(user.namespace)
       labels:
         apps.tanzu.vmware.com/pipeline: test
+        apps.tanzu.vmware.com/language: java
     spec:
       params:
       - name: source-url
