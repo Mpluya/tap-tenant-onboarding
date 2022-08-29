@@ -321,8 +321,8 @@ stringData:
         apps.tanzu.vmware.com/language: dotnet
     spec:
       params:
-        - name: source-url                       # (!) required
-        - name: source-revision                  # (!) required
+        - name: source-url
+        - name: source-revision
       tasks:
         - name: test
           params:
