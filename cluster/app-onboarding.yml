@@ -339,16 +339,9 @@ stringData:
                 image: tapsme/dotnet-sdk:6.0
                 script: |-
                   cd `mktemp -d`
-                  wget -qO- $(params.source-url) | tar xvz -m
+                  wget -qO- $(params.source-url) | tar xvz -m                 
+                  dotnet test *.sln
 
-                  DOTNET_SOLUTION_PATTERN="*.sln"
-
-                  if [ -f "$DOTNET_SOLUTION_PATTERN" ]; then
-                      echo "solution file found"
-                      dotnet test *.sln
-                  else 
-                      dotnet test
-                  fi
                   
     #@ if "exclude_resources" not in user or ("exclude_resources" in user and "developer-defined-tekton-pipeline" not in user.exclude_resources):
     ---
