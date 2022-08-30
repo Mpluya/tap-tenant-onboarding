@@ -301,7 +301,7 @@ stringData:
     apiVersion: v1
     kind: PersistentVolumeClaim
     metadata:
-      name: supplychain-pvc
+      name: supplychainpvc
       namespace: #@ "{}".format(user.namespace)
     spec:
       accessModes:
