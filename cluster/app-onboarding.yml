@@ -305,7 +305,7 @@ stringData:
       namespace: #@ "{}".format(user.namespace)
     spec:
       accessModes:
-      - ReadWriteOnce
+      - ReadWriteMany
       storageClassName: azurefile
       resources:
         requests:
