@@ -341,7 +341,7 @@ stringData:
                   cd `mktemp -d`
                   wget -qO- $(params.source-url) | tar xvz -m
                   npm i
-                  ng test
+                  npm run test
     ---
     apiVersion: tekton.dev/v1beta1
     kind: Pipeline
