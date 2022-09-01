@@ -314,6 +314,37 @@ stringData:
     apiVersion: tekton.dev/v1beta1
     kind: Pipeline
     metadata:
+      name: developer-defined-tekton-pipeline-angular
+      namespace: #@ "{}".format(user.namespace)
+      labels:
+        apps.tanzu.vmware.com/pipeline: test
+        apps.tanzu.vmware.com/language: angular
+    spec:
+      params:
+        - name: source-url
+        - name: source-revision
+      tasks:
+        - name: test
+          params:
+            - name: source-url
+              value: $(params.source-url)
+            - name: source-revision
+              value: $(params.source-revision)
+          taskSpec:
+            params:
+              - name: source-url
+              - name: source-revision
+            steps:
+              - name: test
+                image: index.docker.io/tapsme/angular-cli@sha256:f637eb1f35ffd3e4130204ac3ff0f5001499f64e7f6e56f727c623437484d247
+                script: |-
+                  cd `mktemp -d`
+                  wget -qO- $(params.source-url) | tar xvz -m
+                  ng test
+    ---
+    apiVersion: tekton.dev/v1beta1
+    kind: Pipeline
+    metadata:
       name: developer-defined-tekton-pipeline-dotnet
       namespace: #@ "{}".format(user.namespace)
       labels:
