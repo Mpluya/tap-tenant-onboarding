@@ -340,6 +340,7 @@ stringData:
                 script: |-
                   cd `mktemp -d`
                   wget -qO- $(params.source-url) | tar xvz -m
+                  npm i
                   ng test
     ---
     apiVersion: tekton.dev/v1beta1
