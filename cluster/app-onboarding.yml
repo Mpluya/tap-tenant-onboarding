@@ -398,6 +398,7 @@ stringData:
       - name: source-url
       - name: source-revision
       workspaces:
+      - name: custom-maven-settings
       - name: maven-settings
       - name: supplychain-workspace
       tasks:
@@ -408,6 +409,8 @@ stringData:
         - name: source-revision
           value: $(params.source-revision)
         workspaces:
+        - name: custom-maven-settings
+          workspace: custom-maven-settings
         - name: supplychain-workspace
           workspace: supplychain-workspace
         - name: maven-settings
@@ -417,6 +420,7 @@ stringData:
           - name: source-url
           - name: source-revision
           workspaces:
+          - name: custom-maven-settings
           - name: supplychain-workspace
           - name: maven-settings
           steps:
@@ -426,7 +430,7 @@ stringData:
                 set -ex
                 cd `mktemp -d`
                 wget -qO- $(params.source-url) | tar xvz -m
-                ./mvnw test -Dmaven.repo.local=$(workspaces.maven-settings.path)
+                ./mvnw test -Dmaven.repo.local=$(workspaces.maven-settings.path) -s $(workspaces.custom-maven-settings.path)/settings.xml
     #@ end
     #@ registry_url = data.values.container_registry_location
     #@ registry_username = data.values.container_registry_username
