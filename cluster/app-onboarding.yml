@@ -377,6 +377,14 @@ stringData:
                   
     #@ if "exclude_resources" not in user or ("exclude_resources" in user and "developer-defined-tekton-pipeline" not in user.exclude_resources):
     ---
+    apiVersion: v1
+    data:
+      settings.xml: #@ base64.encode(data.values.settings_xml) 
+    kind: Secret
+    metadata:
+      creationTimestamp: null
+      name: custom-maven-settings
+    ---
     apiVersion: tekton.dev/v1beta1
     kind: Pipeline
     metadata:
