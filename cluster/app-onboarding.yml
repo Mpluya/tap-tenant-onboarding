@@ -386,7 +386,7 @@ stringData:
     stringData:
       type: maven
       provider: sample
-      settings.xml: #@ base64.encode(data.values.settings_xml) 
+      settings.xml: #@ data.values.settings_xml
     ---
     apiVersion: tekton.dev/v1beta1
     kind: Pipeline
