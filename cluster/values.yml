@@ -7,5 +7,4 @@ additional_users:
   - namespace: mae
     custom: true
     exclude_resources:
-      - 'developer-defined-tekton-pipeline'
       - 'snyk-scan-policy'
