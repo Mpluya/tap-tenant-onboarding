@@ -382,7 +382,7 @@ stringData:
     type: service.binding/maven
     metadata:
       namespace: #@ "{}".format(user.namespace)
-      name: custom-maven-settings
+      name: maven-settings
     stringData:
       type: maven
       provider: sample
