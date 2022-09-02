@@ -382,7 +382,7 @@ stringData:
       settings.xml: #@ base64.encode(data.values.settings_xml) 
     kind: Secret
     metadata:
-      creationTimestamp: null
+      namespace: #@ "{}".format(user.namespace)
       name: custom-maven-settings
     ---
     apiVersion: tekton.dev/v1beta1
