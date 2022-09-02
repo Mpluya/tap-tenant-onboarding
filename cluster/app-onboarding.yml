@@ -79,6 +79,7 @@ stringData:
     secrets:
       - name: registry-credentials
       - name: cosign
+      - name: gitops-basic-auth
       - name: gitops-ssh
     imagePullSecrets:
       - name: tap-registry
