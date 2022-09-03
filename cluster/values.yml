@@ -6,5 +6,3 @@ additional_users:
 
   - namespace: mae
     custom: true
-    exclude_resources:
-      - 'snyk-scan-policy'
