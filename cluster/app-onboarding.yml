@@ -392,7 +392,7 @@ stringData:
               - name: source-revision
             steps:
               - name: test
-                image: index.docker.io/tapsme/dotnet-sdk@sha256:a449474589fc907592cc70410b2a133e5d0fc35e2527ec4ca2ea5a29e03c27d0
+                image: index.docker.io/tapsme/dotnet-with-headless-chrome@sha256:540191076d5e2941ea625fe4e27d9f3cc33ab9f5a9c17a297f53dae43f920fdc
                 script: |-
                   cd `mktemp -d`
                   wget -qO- $(params.source-url) | tar xvz -m                 
