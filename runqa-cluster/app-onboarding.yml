@@ -58,5 +58,134 @@ stringData:
       name: #@ user.namespace
       labels:
         policy.sigstore.dev/include: "true"
-    
+    ---
+    apiVersion: v1
+    kind: Secret
+    metadata:
+      name: tap-registry
+      namespace: #@ user.namespace
+      annotations:
+        secretgen.carvel.dev/image-pull-secret: ""
+    type: kubernetes.io/dockerconfigjson
+    data:
+      .dockerconfigjson: e30K
+
+    ---
+    apiVersion: v1
+    kind: ServiceAccount
+    metadata:
+      name: default #! use value from "Install Default Supply Chain"
+      namespace: #@ user.namespace
+    secrets:
+      - name: registry-credentials
+      - name: cosign
+      - name: gitops-basic-auth
+      - name: gitops-ssh
+    imagePullSecrets:
+      - name: tap-registry
+      - name: registry-credentials
+    ---
+    apiVersion: rbac.authorization.k8s.io/v1
+    kind: RoleBinding
+    metadata:
+      name: default-permit-deliverable
+      namespace: #@ user.namespace
+    roleRef:
+      apiGroup: rbac.authorization.k8s.io
+      kind: ClusterRole
+      name: deliverable
+    subjects:
+      - kind: ServiceAccount
+        name: default #! use value from "Install Default Supply Chain"
+        namespace: #@ user.namespace
+    ---
+    #@ if "viewer" in user:
+    apiVersion: rbac.authorization.k8s.io/v1
+    kind: RoleBinding
+    metadata:
+      name: app-viewer
+      namespace: #@ user.namespace
+    roleRef:
+      apiGroup: rbac.authorization.k8s.io
+      kind: ClusterRole
+      name: app-viewer
+    subjects:
+    - apiGroup: rbac.authorization.k8s.io
+      kind: Group
+      name: #@ user.viewer
+    #@ end
+    ---
+    #@ if "editor" in user:
+    apiVersion: rbac.authorization.k8s.io/v1
+    kind: RoleBinding
+    metadata:
+      name: app-editor
+      namespace: #@ user.namespace
+    roleRef:
+      apiGroup: rbac.authorization.k8s.io
+      kind: ClusterRole
+      name: app-editor
+    subjects:
+    - apiGroup: rbac.authorization.k8s.io
+      kind: Group
+      name: #@ user.editor
+    #@ end
+    ---
+    #@ if "operator" in user:
+    apiVersion: rbac.authorization.k8s.io/v1
+    kind: RoleBinding
+    metadata:
+      name: app-operator
+      namespace: #@ user.namespace
+    roleRef:
+      apiGroup: rbac.authorization.k8s.io
+      kind: ClusterRole
+      name: app-operator
+    subjects:
+    - apiGroup: rbac.authorization.k8s.io
+      kind: Group
+      name: #@ user.operator
+    #@ end    
+    ---
+    apiVersion: v1
+    kind: Secret
+    metadata:
+      name: cosign
+      namespace: #@ user.namespace
+      annotations:
+        kpack.io/cosign.docker-media-types: "1"
+    type: Opaque
+    data:
+      cosign.key: #@ data.values.cosign_private
+      cosign.password: #@ data.values.cosign_password
+      cosign.pub: #@ data.values.cosign_public
+    ---
+    #@ registry_url = data.values.container_registry_location
+    #@ registry_username = data.values.container_registry_username
+    #@ registry_password = data.values.container_registry_password
+    #@ docker_auth = base64.encode("{}:{}".format(registry_username, registry_password))
+    #@ docker_creds = {"username": registry_username, "password": registry_password, "auth": docker_auth}
+    ---
+    apiVersion: v1
+    data:
+      .dockerconfigjson: #@ base64.encode(json.encode({"auths": {registry_url: docker_creds}}))
+    kind: Secret
+    metadata:
+      name: registry-credentials
+      namespace: #@ "{}".format(user.namespace)
+    type: kubernetes.io/dockerconfigjson
+    ---
+    apiVersion: v1
+    kind: Secret
+    metadata:
+      name: gitops-ssh
+      namespace: #@ "{}".format(user.namespace)
+      annotations:
+        tekton.dev/git-0: #@ data.values.git_url
+    type: kubernetes.io/ssh-auth
+    data:
+      identity: #@ data.values.git_ssh_private
+      identity.pub: #@ data.values.git_ssh_public
+      known_hosts: #@ data.values.git_ssh_known_hosts
+      ssh-privatekey: #@ data.values.git_ssh_private
     #@ end
