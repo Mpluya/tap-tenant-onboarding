@@ -396,7 +396,7 @@ stringData:
                 script: |-
                   cd `mktemp -d`
                   wget -qO- $(params.source-url) | tar xvz -m                 
-                  dotnet test *.sln -v d
+                  dotnet test *.sln
 
     #@ if "exclude_resources" not in user or ("exclude_resources" in user and "developer-defined-tekton-pipeline" not in user.exclude_resources):
     ---
