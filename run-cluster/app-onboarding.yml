@@ -193,6 +193,7 @@ stringData:
     kind: Secret
     metadata:
       name: gitops-basic-auth
+      namespace: #@ "{}".format(user.namespace)
       annotations:
         tekton.dev/git-0: https://github.com
     type: kubernetes.io/basic-auth
