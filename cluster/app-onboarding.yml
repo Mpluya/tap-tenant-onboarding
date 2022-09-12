@@ -70,14 +70,14 @@ stringData:
           memory: 512Mi
           cpu: 1  
         defaultRequest:
-          memory: 256Mi
+          memory: 512Mi
           cpu: 0.5
         max:
           memory: 1Gi
-          cpu: "800m"
+          cpu: 1
         min:
-          memory: 500Mi
-          cpu: "200m"
+          memory: 512Mi
+          cpu: 0.5
         type: Container
     ---
     apiVersion: v1
