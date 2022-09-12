@@ -60,16 +60,25 @@ stringData:
         policy.sigstore.dev/include: "true"
     ---
     apiVersion: v1
-    kind: ResourceQuota
+    kind: LimitRange
     metadata:
-      name: small-quota
+      name: default-limit-range
       namespace: #@ user.namespace
     spec:
-      hard:
-        limits.cpu: "1"
-        limits.memory: 2G
-        requests.cpu: 500m
-        requests.memory: 512Mi
+      limits:
+      - default:
+          memory: 512Mi
+          cpu: 1  
+        defaultRequest:
+          memory: 256Mi
+          cpu: 0.5
+      - max:
+          memory: 1Gi
+          cpu: "800m"
+        min:
+          memory: 500Mi
+          cpu: "200m"
+        type: Container
     ---
     apiVersion: v1
     kind: Secret
