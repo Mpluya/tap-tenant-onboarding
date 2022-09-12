@@ -60,6 +60,17 @@ stringData:
         policy.sigstore.dev/include: "true"
     ---
     apiVersion: v1
+    kind: ResourceQuota
+    metadata:
+      name: small-quota
+    spec:
+      hard:
+        limits.cpu: "1"
+        limits.memory: 2G
+        requests.cpu: 500m
+        requests.memory: 512Mi
+    ---
+    apiVersion: v1
     kind: Secret
     metadata:
       name: tap-registry
