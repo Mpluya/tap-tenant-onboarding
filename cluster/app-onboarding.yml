@@ -63,6 +63,7 @@ stringData:
     kind: ResourceQuota
     metadata:
       name: small-quota
+      namespace: #@ user.namespace
     spec:
       hard:
         limits.cpu: "1"
