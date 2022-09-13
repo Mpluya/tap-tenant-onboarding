@@ -227,7 +227,7 @@ stringData:
       packageRef:
         refName: grype.scanning.apps.tanzu.vmware.com
         versionSelection:
-          constraints: 1.2.2
+          constraints: 1.2.3
       serviceAccountName: tap-tap-install-sa
       values:
       - secretRef:
@@ -258,7 +258,7 @@ stringData:
       packageRef:
         refName: snyk.scanning.apps.tanzu.vmware.com
         versionSelection:
-          constraints: 1.0.0-beta.2
+          constraints: 1.0.0-beta.3
       serviceAccountName: tap-tap-install-sa
       values:
       - secretRef:
