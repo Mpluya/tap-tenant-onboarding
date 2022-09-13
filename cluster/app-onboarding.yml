@@ -60,27 +60,6 @@ stringData:
         policy.sigstore.dev/include: "true"
     ---
     apiVersion: v1
-    kind: LimitRange
-    metadata:
-      name: default-limit-range
-      namespace: #@ user.namespace
-    spec:
-      limits:
-      - default:
-          memory: 250Mi
-          cpu: 250m  
-        defaultRequest:
-          memory: 100Mi
-          cpu: 250m
-        max:
-          memory: 2Gi
-          cpu: 500m
-        min:
-          memory: 100Mi
-          cpu: 250m
-        type: Container
-    ---
-    apiVersion: v1
     kind: Secret
     metadata:
       name: tap-registry
@@ -90,7 +69,6 @@ stringData:
     type: kubernetes.io/dockerconfigjson
     data:
       .dockerconfigjson: e30K
-
     ---
     apiVersion: v1
     kind: ServiceAccount
