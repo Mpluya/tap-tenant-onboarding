@@ -67,17 +67,17 @@ stringData:
     spec:
       limits:
       - default:
-          memory: 512Mi
-          cpu: 500m  
+          memory: 250Mi
+          cpu: 250m  
         defaultRequest:
-          memory: 512Mi
-          cpu: 500m
+          memory: 100Mi
+          cpu: 250m
         max:
           memory: 2Gi
-          cpu: 1
-        min:
-          memory: 512Mi
           cpu: 500m
+        min:
+          memory: 100Mi
+          cpu: 250m
         type: Container
     ---
     apiVersion: v1
