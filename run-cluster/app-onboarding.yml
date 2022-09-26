@@ -57,7 +57,7 @@ stringData:
     metadata:
       name: #@ user.namespace
       labels:
-        policy.sigstore.dev/include: "true"
+        policy.sigstore.dev/include: "false"
     ---
     apiVersion: v1
     kind: Secret
