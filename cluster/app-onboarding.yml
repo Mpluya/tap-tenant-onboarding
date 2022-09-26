@@ -227,7 +227,7 @@ stringData:
       packageRef:
         refName: grype.scanning.apps.tanzu.vmware.com
         versionSelection:
-          constraints: 1.2.3
+          constraints: 1.3.0
       serviceAccountName: tap-tap-install-sa
       values:
       - secretRef:
@@ -240,73 +240,6 @@ stringData:
       namespace: tap-install
     stringData:
       values.yaml: #@ yaml.encode({ "namespace": user.namespace, "targetImagePullSecret": "registry-credentials" })
-    ---
-    apiVersion: v1
-    data:
-      snyk_token: #@ base64.encode(data.values.snyk_api_token) 
-    kind: Secret
-    metadata:
-      name: snyk-token-secret
-      namespace: #@ "{}".format(user.namespace)
-    ---
-    apiVersion: packaging.carvel.dev/v1alpha1
-    kind: PackageInstall
-    metadata:
-      name: #@ "snyk-{}".format(user.namespace)
-      namespace: tap-install
-    spec:
-      packageRef:
-        refName: snyk.scanning.apps.tanzu.vmware.com
-        versionSelection:
-          constraints: 1.0.0-beta.3
-      serviceAccountName: tap-tap-install-sa
-      values:
-      - secretRef:
-          name: #@ "snyk-values-{}".format(user.namespace)
-    ---
-    apiVersion: v1
-    kind: Secret
-    metadata:
-      name: #@ "snyk-values-{}".format(user.namespace)
-      namespace: tap-install
-    stringData:
-      values.yaml: #@ yaml.encode({ "namespace": user.namespace, "targetImagePullSecret": "registry-credentials",  "snyk": {"tokenSecret": {"name": "snyk-token-secret"}}, "metadataStore": {"caSecret": {"importFromNamespace": ""},"authSecret": {"importFromNamespace": ""}} })
-    #@ if "exclude_resources" not in user or ("exclude_resources" in user and "snyk-scan-policy" not in user.exclude_resources):
-    ---
-    apiVersion: scanning.apps.tanzu.vmware.com/v1beta1
-    kind: ScanPolicy
-    metadata:
-      name: snyk-scan-policy
-      namespace: #@ "{}".format(user.namespace)
-    spec:
-      regoFile: |
-        package main
-
-        notAllowedSeverities := ["Critical"]
-        ignoreCves := [""]
-
-        contains(array, elem) = true {
-          array[_] = elem
-        } else = false { true }
-
-        isSafe(match) {
-          fails := contains(notAllowedSeverities, match.relationships[_].ratedBy.rating[_].severity)
-          not fails
-        }
-
-        isSafe(match) {
-          ignore := contains(ignoreCves, match.id)
-          ignore
-        }
-
-        deny[msg] {
-          vuln := input.vulnerabilities[_]
-          ratings := vuln.relationships[_].ratedBy.rating[_].severity
-          comp := vuln.relationships[_].affect.to[_]
-          not isSafe(vuln)
-          msg = sprintf("%s %s %s", [comp, vuln.id, ratings])
-        }
-    #@ end
     ---
     apiVersion: v1
     kind: Secret
