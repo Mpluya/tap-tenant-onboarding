@@ -183,7 +183,7 @@ stringData:
       name: #@ user.operator
     #@ end
     ---
-    apiVersion: scanning.apps.tanzu.vmware.com/v1alpha1
+    apiVersion: scanning.apps.tanzu.vmware.com/v1beta1
     kind: ScanPolicy
     metadata:
       name: scan-policy
