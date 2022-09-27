@@ -214,4 +214,30 @@ stringData:
     stringData:
       username: #@ data.values.git_basic_auth_username
       password: #@ data.values.git_basic_auth_password
+    ---
+    #@ if "custom" in user:
+    apiVersion: kappctrl.k14s.io/v1alpha1
+    kind: App
+    metadata:
+      name: #@ "{}-addons".format(user.namespace)
+      namespace: tap-install
+    spec:
+      serviceAccountName: tap-tap-install-sa
+      fetch:
+      - git:
+          url: ssh://git@github.com/Mpluya/tap-tenant-onboarding
+          ref: origin/1.3
+          subPath: #@ "tenants/{}".format(user.namespace)
+          secretRef: 
+            name: tap-install-gitops-ssh
+      template:
+      - ytt:
+          inline:
+            paths:
+              ns-overlay.yaml: #@ "#@ load(\"@ytt:data\", \"data\")\n#@ load(\"@ytt:overlay\", \"overlay\")\n#@overlay/match by=overlay.all, expects=\"1+\"\n---\nmetadata:\n  #@overlay/match missing_ok=True\n  namespace: {}".format(user.namespace)
+      deploy:
+      - kapp:
+          rawOptions:
+          - --diff-changes=true
+    #@ end 
     #@ end

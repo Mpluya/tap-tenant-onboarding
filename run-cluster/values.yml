@@ -2,5 +2,5 @@
 ---
 additional_users: 
   - namespace: rehan
-
+    custom: true
   - namespace: mae
