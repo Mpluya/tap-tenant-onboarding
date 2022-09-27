@@ -52,7 +52,7 @@ spec:
             - --insecure-oidc-allow-unverified-email=true
             - --oidc-groups-claim=roles
             - --upstream=http://127.0.0.1:8000
-            - --redirect-url=http://test-app.example.com/oauth2/callback
+            - --redirect-url=http://test-app.run.postcvs.tapsme.org/oauth2/callback
             - --skip-provider-button=true
             - --pass-authorization-header=true
             - --prefer-email-to-user=true
@@ -122,7 +122,7 @@ metadata:
   namespace: rehan
 spec:
   virtualhost:
-    fqdn: test-app.example.com
+    fqdn: test-app.run.postcvs.tapsme.org
   routes:
     - conditions:
         - prefix: /
