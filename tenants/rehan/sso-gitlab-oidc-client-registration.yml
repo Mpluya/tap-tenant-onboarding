@@ -16,5 +16,3 @@ spec:
       - "authorization_code"
    scopes:
       - name: "openid"
-      - name: "email"
-      - name: "profile"
