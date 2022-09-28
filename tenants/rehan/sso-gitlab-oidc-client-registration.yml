@@ -9,9 +9,9 @@ spec:
          name: gitlab-oidc-example
          env: tutorial
    redirectURIs:
-      - "http://test-app.run.postcvs.tapsme.org/oauth2/callback"
+      - "http://test-gitlabsso.run.postcvs.tapsme.org/oauth2/callback"
    requireUserConsent: false
-   clientAuthenticationMethod: basic
+   clientAuthenticationMethod: post
    authorizationGrantTypes:
       - "client_credentials"
       - "authorization_code"
