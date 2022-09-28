@@ -1,7 +1,7 @@
 apiVersion: sso.apps.tanzu.vmware.com/v1alpha1
 kind: ClientRegistration
 metadata:
-   name: gitlab-oidc-client-registration
+   name: appsso-starter-java
    namespace: rehan
 spec:
    authServerSelector:
@@ -9,7 +9,7 @@ spec:
          name: gitlab-oidc-example
          env: tutorial
    redirectURIs:
-      - "http://appsso-starter-java.rehan.run.postcvs.tapsme.org/login/oauth2/code/gitlab-oidc-client-registration"
+      - "http://appsso-starter-java.rehan.run.postcvs.tapsme.org/login/oauth2/code/appsso-starter-java"
    requireUserConsent: false
    authorizationGrantTypes:
       - "client_credentials"
