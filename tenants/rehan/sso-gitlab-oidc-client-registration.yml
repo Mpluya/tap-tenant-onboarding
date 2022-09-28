@@ -9,7 +9,7 @@ spec:
          name: gitlab-oidc-example
          env: tutorial
    redirectURIs:
-      - "http://appsso-starter-java.rehan.run.postcvs.tapsme.org/login/oauth2/code/gitlab-oidc-client-claim"
+      - "http://appsso-starter-java.rehan.run.postcvs.tapsme.org/login/oauth2/code/gitlab-oidc-client-registration"
    requireUserConsent: false
    authorizationGrantTypes:
       - "client_credentials"
