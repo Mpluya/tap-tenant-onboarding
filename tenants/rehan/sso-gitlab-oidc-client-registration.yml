@@ -11,8 +11,8 @@ spec:
    redirectURIs:
       - "http://appsso-starter-java.rehan.run.postcvs.tapsme.org/login/oauth2/code/appsso-starter-java"
    requireUserConsent: false
-   clientAuthenticationMethod: client_secret_basic
    authorizationGrantTypes:
-      - authorization_code
+      - "client_credentials"
+      - "authorization_code"
    scopes:
       - name: "openid"
