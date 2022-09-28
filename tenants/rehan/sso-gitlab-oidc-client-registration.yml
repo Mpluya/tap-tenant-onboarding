@@ -1,12 +1,12 @@
 apiVersion: sso.apps.tanzu.vmware.com/v1alpha1
 kind: ClientRegistration
 metadata:
-   name: my-client-registration
+   name: gitlab-oidc-client-registration
    namespace: rehan
 spec:
    authServerSelector:
       matchLabels:
-         name: my-first-auth-server
+         name: gitlab-oidc-example
          env: tutorial
    redirectURIs:
       - "http://test-app.run.postcvs.tapsme.org/oauth2/callback"
