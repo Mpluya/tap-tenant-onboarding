@@ -4,15 +4,16 @@ metadata:
    name: okta-clientreg
    namespace: rehan
 spec:
-   authServerSelector:
-      matchLabels:
-         name: okta
-         env: tutorial
-   redirectURIs:
-      - "http://okta-appsso.rehan.run.postcvs.tapsme.org/login/oauth2/code/okta"
-   requireUserConsent: false
-   authorizationGrantTypes:
-      - "client_credentials"
-      - "authorization_code"
-   scopes:
-      - name: "openid"
+  authServerSelector:
+    matchLabels:
+        name: okta
+        env: tutorial
+  redirectURIs:
+    - "http://okta-appsso.rehan.run.postcvs.tapsme.org/login/oauth2/code/okta"
+  requireUserConsent: true
+  clientAuthenticationMethod: basic
+  authorizationGrantTypes:
+    - "client_credentials"
+    - "authorization_code"
+  scopes:
+    - name: "openid"
