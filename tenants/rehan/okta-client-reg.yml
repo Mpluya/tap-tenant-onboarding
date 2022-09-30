@@ -9,7 +9,7 @@ spec:
          name: okta
          env: tutorial
    redirectURIs:
-      - "http://okta-appsso.rehan.run.postcvs.tapsme.org/login/oauth2/code/okta-claim"
+      - "http://okta-appsso.rehan.run.postcvs.tapsme.org/login/oauth2/code/okta"
    requireUserConsent: false
    authorizationGrantTypes:
       - "client_credentials"
