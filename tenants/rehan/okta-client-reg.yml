@@ -1,19 +1,19 @@
+---
 apiVersion: sso.apps.tanzu.vmware.com/v1alpha1
 kind: ClientRegistration
 metadata:
-   name: okta-clientreg
-   namespace: rehan
+  name: okta-clientreg
+  namespace: rehan
 spec:
   authServerSelector:
     matchLabels:
-        name: okta
-        env: tutorial
-  redirectURIs:
-    - "http://okta-appsso.rehan.run.postcvs.tapsme.org/login/oauth2/code/okta"
-  requireUserConsent: true
+      name: okta
+      env: tutorial
   clientAuthenticationMethod: basic
   authorizationGrantTypes:
-    - "client_credentials"
-    - "authorization_code"
+    - authorization_code
+  redirectURIs:
+    - "http://okta-appsso.rehan.run.postcvs.tapsme.org/login/oauth2/code/okta"
+    - "http:///127.0.0.1:8080/login/oauth2/code/okta"
   scopes:
-    - name: "openid"
+    - name: openid
