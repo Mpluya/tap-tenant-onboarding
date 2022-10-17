@@ -650,7 +650,7 @@ stringData:
       fetch:
       - git:
           url: ssh://git@github.com/Mpluya/tap-tenant-onboarding
-          ref: origin/custom
+          ref: origin/1.3
           subPath: #@ "tenants/{}".format(user.namespace)
           secretRef: 
             name: tap-install-gitops-ssh
