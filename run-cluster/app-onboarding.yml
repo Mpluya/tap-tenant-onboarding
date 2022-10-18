@@ -229,7 +229,7 @@ stringData:
           ref: origin/1.3
           subPath: #@ "tenants/{}".format(user.namespace)
           secretRef: 
-            name: tap-install-gitops-ssh
+            name: tap-install-gitops-ssh-external-secret
       template:
       - ytt:
           inline:
