@@ -265,6 +265,18 @@ stringData:
     apiVersion: v1
     kind: Secret
     metadata:
+      name: carbon-black-config-secret
+      namespace: #@ user.namespace
+    type: Opaque
+    stringData:
+      cbc_api_id: #@ data.values.cbc_api_id
+      cbc_api_key: #@ data.values.cbc_api_key
+      cbc_org_key: #@ data.values.cbc_org_key
+      cbc_saas_url: #@ data.values.cbc_saas_url
+    ---
+    apiVersion: v1
+    kind: Secret
+    metadata:
       name: jenkins-secret
       namespace: #@ user.namespace
     type: Opaque
