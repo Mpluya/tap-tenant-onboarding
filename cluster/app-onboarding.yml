@@ -263,6 +263,17 @@ stringData:
       cosign.pub: #@ data.values.cosign_public
     ---
     apiVersion: v1
+    kind: Secret
+    metadata:
+      name: jenkins-secret
+      namespace: #@ user.namespace
+    type: Opaque
+    stringData:
+      url: #@ data.values.jenkins_url
+      username: #@ data.values.jenkins_username
+      password: #@ data.values.jenkins_password
+    ---
+    apiVersion: v1
     kind: PersistentVolumeClaim
     metadata:
       name: supplychainpvc
