@@ -1,0 +1,38 @@
+---
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: developer-defined-jenkins-tekton-pipeline
+  namespace: rehan
+  labels:
+    #! This label should be provided to the Workload so that
+    #! the supply chain can find this pipeline
+    apps.tanzu.vmware.com/pipeline: jenkins-pipeline
+spec:
+  results:
+  - name: jenkins-job-url   #! To show the job URL on the TAP GUI
+    value: $(tasks.jenkins-task.results.jenkins-job-url)
+  params:
+  - name: source-url        #! Required
+  - name: source-revision   #! Required
+  - name: secret-name       #! Required
+  - name: job-name          #! Required
+  - name: job-params        #! Required
+  tasks:
+  #! Required: Include the built-in task that triggers the
+  #! given job in Jenkins
+  - name: jenkins-task
+    taskRef:
+      name: jenkins-task
+      kind: ClusterTask
+    params:
+      - name: source-url
+        value: $(params.source-url)
+      - name: source-revision
+        value: $(params.source-revision)
+      - name: secret-name
+        value: $(params.secret-name)
+      - name: job-name
+        value: $(params.job-name)
+      - name: job-params
+        value: $(params.job-params)
