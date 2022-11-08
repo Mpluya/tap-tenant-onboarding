@@ -8,6 +8,7 @@ metadata:
     #! This label should be provided to the Workload so that
     #! the supply chain can find this pipeline
     apps.tanzu.vmware.com/pipeline: jenkins-pipeline
+    apps.tanzu.vmware.com/language: java
 spec:
   results:
   - name: jenkins-job-url   #! To show the job URL on the TAP GUI
