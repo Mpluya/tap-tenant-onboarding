@@ -285,12 +285,12 @@ stringData:
       cbc_saas_url: #@ data.values.cbc_saas_url
     ---
     apiVersion: v1
-    stringData:
-      prisma_token: #@ data.values.prisma_token
     kind: Secret
     metadata:
       name: prisma-token
-      namespace: tap-install
+      namespace: #@ user.namespace
+    stringData:
+      prisma_token: #@ data.values.prisma_token
     ---
     apiVersion: packaging.carvel.dev/v1alpha1
     kind: PackageInstall
