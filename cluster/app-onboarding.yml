@@ -287,6 +287,39 @@ stringData:
     apiVersion: v1
     kind: Secret
     metadata:
+      name: prisma-token
+      namespace: #@ user.namespace
+    stringData:
+      prisma_token: #@ data.values.prisma_token
+    ---
+    apiVersion: packaging.carvel.dev/v1alpha1
+    kind: PackageInstall
+    metadata:
+      annotations:
+        packaging.carvel.dev/downgradable: ""
+      name: #@ "prisma-{}".format(user.namespace)
+      namespace: tap-install
+    spec:
+      packageRef:
+        refName: prisma.scanning.apps.tanzu.vmware.com
+        versionSelection:
+          constraints: "0.1.0-beta.4"
+      serviceAccountName: tap-tap-install-sa
+      values:
+      - secretRef:
+          name: #@ "prisma-values-{}".format(user.namespace)
+    ---
+    apiVersion: v1
+    kind: Secret
+    metadata:
+      name: #@ "prisma-values-{}".format(user.namespace)
+      namespace: tap-install
+    stringData:
+      values.yaml: #@ yaml.encode({"namespace": user.namespace,"targetImagePullSecret": "registry-credentials","prisma": {"url": "https://us-west1.cloud.twistlock.com/us-4-161033339","tokenSecret": {"name": "prisma-token"}},"metadataStore": {"caSecret":{"importFromNamespace": ""},"authSecret": {"importFromNamespace": ""}}})
+    ---
+    apiVersion: v1
+    kind: Secret
+    metadata:
       name: cosign
       namespace: #@ user.namespace
       annotations:
