@@ -295,6 +295,8 @@ stringData:
     apiVersion: packaging.carvel.dev/v1alpha1
     kind: PackageInstall
     metadata:
+      annotations:
+        packaging.carvel.dev/downgradable: ""
       name: #@ "prisma-{}".format(user.namespace)
       namespace: tap-install
     spec:
