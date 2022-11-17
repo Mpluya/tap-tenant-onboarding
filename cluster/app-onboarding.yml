@@ -275,6 +275,49 @@ stringData:
     apiVersion: v1
     kind: Secret
     metadata:
+      name: carbon-black-config-secret
+      namespace: #@ user.namespace
+    type: Opaque
+    stringData:
+      cbc_api_id: #@ data.values.cbc_api_id
+      cbc_api_key: #@ data.values.cbc_api_key
+      cbc_org_key: #@ data.values.cbc_org_key
+      cbc_saas_url: #@ data.values.cbc_saas_url
+    ---
+    apiVersion: v1
+    stringData:
+      prisma_token: #@ data.values.prisma_token
+    kind: Secret
+    metadata:
+      name: prisma-token
+      namespace: tap-install
+    ---
+    apiVersion: packaging.carvel.dev/v1alpha1
+    kind: PackageInstall
+    metadata:
+      name: #@ "prisma-{}".format(user.namespace)
+      namespace: tap-install
+    spec:
+      packageRef:
+        refName: prisma.scanning.apps.tanzu.vmware.com
+        versionSelection:
+          constraints: "0.1.0-beta.1"
+      serviceAccountName: tap-tap-install-sa
+      values:
+      - secretRef:
+          name: #@ "prisma-values-{}".format(user.namespace)
+    ---
+    apiVersion: v1
+    kind: Secret
+    metadata:
+      name: #@ "prisma-values-{}".format(user.namespace)
+      namespace: tap-install
+    stringData:
+      values.yaml: #@ yaml.encode({"namespace": "user.namespace","targetImagePullSecret": "registry-credentials","prisma": {"url": "https://app.prismacloud.io","tokenSecret": {"name": "prisma-token"}},"metadataStore": {"caSecret":{"importFromNamespace": ""},"authSecret": {"importFromNamespace": ""}}})
+    ---
+    apiVersion: v1
+    kind: Secret
+    metadata:
       name: cosign
       namespace: #@ user.namespace
       annotations:
@@ -284,18 +327,6 @@ stringData:
       cosign.key: #@ data.values.cosign_private
       cosign.password: #@ data.values.cosign_password
       cosign.pub: #@ data.values.cosign_public
-    ---
-    apiVersion: v1
-    kind: Secret
-    metadata:
-      name: carbon-black-config-secret
-      namespace: #@ user.namespace
-    type: Opaque
-    stringData:
-      cbc_api_id: #@ data.values.cbc_api_id
-      cbc_api_key: #@ data.values.cbc_api_key
-      cbc_org_key: #@ data.values.cbc_org_key
-      cbc_saas_url: #@ data.values.cbc_saas_url
     ---
     apiVersion: v1
     kind: Secret
