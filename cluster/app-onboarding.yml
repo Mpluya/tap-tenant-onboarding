@@ -287,10 +287,11 @@ stringData:
     apiVersion: v1
     kind: Secret
     metadata:
-      name: prisma-token
+      name: prisma-basic-auth
       namespace: #@ user.namespace
     stringData:
-      prisma_token: #@ data.values.prisma_token
+      username: #@ data.values.prisma_username
+      password: #@ data.values.prisma_password
     ---
     apiVersion: packaging.carvel.dev/v1alpha1
     kind: PackageInstall
