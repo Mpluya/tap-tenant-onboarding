@@ -303,7 +303,7 @@ stringData:
       packageRef:
         refName: prisma.scanning.apps.tanzu.vmware.com
         versionSelection:
-          constraints: "0.1.0-beta.4"
+          constraints: "0.1.0-beta.7"
       serviceAccountName: tap-tap-install-sa
       values:
       - secretRef:
